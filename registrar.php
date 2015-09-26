@@ -10,10 +10,15 @@ $verificar = strtolower($_SESSION['captcha']['code']);
 if($captcha == $verificar){
     if(isset($_POST['nombre_visitante']) && isset($_POST['mensaje_visitante']))
     {
-        $conexion = new conectarBD;
-        $operacion = new operacionesBD;
+        $conexion = new Conexion();
 
-        $operacion->registrarVisitas($conexion->conexion, $_POST['nombre_visitante'], $_POST['mensaje_visitante']);
+        $comentario = new Comentario();
+        $comentario->nombre = $_POST['nombre_visitante'];
+        $comentario->mensaje = $_POST['mensaje_visitante'];
+
+        $operador = new Operador();
+        $operador->guardarComentario($conexion,$comentario);
+
         header('Location: index.php');
     }
     else

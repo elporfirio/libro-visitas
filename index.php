@@ -46,19 +46,22 @@ $_SESSION['captcha'] = simple_php_captcha();
         <?php
 		require_once("clases.php");
 
-        $miconexion = new conectarBD();
-        $operaciones = new operacionesBD();
+        $conexion = new Conexion();
 
-        $operaciones->consultarVisitas($miconexion->conexion);
-        $registros = $operaciones->obtenerRegistroVisitas();
+        #$comentario = new Comentario();
+        $operador = new Operador();
+        $operador->consultarComentarios($conexion);
+
+        $comentarios = $operador->comentarios;
+
 		
-		for($i=0; $i<count($registros); $i++)
+		foreach($comentarios as $comentario)
 		{
         ?>
         <tr>
-    		<td><?php echo $registros[$i]['nombre']; ?></td>
-    		<td><?php echo $registros[$i]['comentario']; ?></td>
-    		<td align="center"><?php echo $registros[$i]['fecha']; ?></td>
+    		<td><?php echo $comentario->nombre; ?></td>
+    		<td><?php echo $comentario->mensaje; ?></td>
+    		<td align="center"><?php echo $comentario->fecha; ?></td>
         </tr>
         <?php
 		}
