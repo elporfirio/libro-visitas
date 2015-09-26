@@ -2,15 +2,36 @@
 
 ## Descomentar para versiones de PHP y MySQL actuales
 ## para evitar los errores de funciones obsoletas
-ini_set('display_errors', '0');
+#ini_set('display_errors', '0');
 
 class conectarBD
 {
-	public static function conectarse(){
-		$conexionSQL = mysql_connect("localhost","homestead","secret");
-		mysql_query("SET NAMES 'utf8'");
-		mysql_select_db("libro-visitas");
-		return $conexionSQL;
+	private $domain = "localhost";
+	private $database = "libro-visitas";
+	private $user = "homestead";
+	private $password = "secret";
+
+	public $conexion = null;
+
+	public function conectarse(){
+		try {
+			$this->conexion = new PDO(
+				'mysql:host=' . $this->domain . ';dbname=' . $this->database .';port=3306',
+				$this->user,
+				$this->password,
+				array(
+					PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+					PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+			);
+			//$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		} catch (PDOException $ex){
+			echo "<strong>Error de Conexión: </strong>" . $ex->getMessage() . "<br>";
+			die();
+		}
+	}
+
+	public function __construct(){
+		$this->conectarse();
 	}
 }
 
@@ -19,41 +40,45 @@ class operacionesBD
 	private $registrovisitas;
 	
 	public function __construct(){
-		$this->registrovisitas = array();
+		$this->registrovisitas = [];
+	}
+
+	public function obtenerRegistroVisitas(){
+		return $this->registrovisitas;
 	}
 	
-	public function consultarVisitas(){
+	public function consultarVisitas($conexion){
 		$consulta = "SELECT * FROM librovisitas ORDER BY fecha DESC";
-		$resultado = mysql_query($consulta,conectarBD::conectarse());
-		
-		if($consulta)
-		{
-			while($registro = mysql_fetch_assoc($resultado)){
-			$this->registrovisitas[]=$registro;
+
+		try{
+			$stmt = $conexion->prepare($consulta);
+
+			if($stmt->execute()){
+				$this->registrovisitas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			}
-			return $this->registrovisitas;
-		}
-		else
-		{
-			echo "Error: ".mysql_errno().
-			     " ".mysql_error();
-			die;
+		} catch (PDOException $ex){
+			echo "<strong>Error de ejecución: </strong>" . $ex->getMessage() . "<br>";
+			die();
 		}
 	}
 	
-	public function registrarVisitas($nombre,$mensaje){
-		$consulta = "INSERT INTO librovisitas values (null,'$nombre','$mensaje', now())";
-		
-		$resultado = mysql_query($consulta,conectarBD::conectarse());
-		
-		if(!$resultado)
-		{
-			echo "Error no se ingresaron los datos: ".mysql_errno().
-			     " ".mysql_error();
-			//die;
+	public function registrarVisitas($conexion, $nombre, $mensaje){
+		$consulta = 'INSERT INTO librovisitas values (null, :nombre, :mensaje, now())';
+
+		try{
+			$stmt = $conexion->prepare($consulta);
+
+			$stmt->bindParam(':nombre', $nombre);
+			$stmt->bindParam(':mensaje', $mensaje);
+
+			if($stmt->execute()){
+				return $conexion->lastInsertId(); //Devuelve el último ID que se inserta
+			}
+		} catch (PDOException $ex){
+			echo "<strong>Error de ejecución: </strong>" . $ex->getMessage() . "<br>";
+			die();
 		}
-		
-		}
+	}
 }
 
 ?>

@@ -45,9 +45,12 @@ $_SESSION['captcha'] = simple_php_captcha();
         <tbody>
         <?php
 		require_once("clases.php");
-		
-		$mostrarcomentarios = new operacionesBD;
-		$registros = $mostrarcomentarios->consultarVisitas();
+
+        $miconexion = new conectarBD();
+        $operaciones = new operacionesBD();
+
+        $operaciones->consultarVisitas($miconexion->conexion);
+        $registros = $operaciones->obtenerRegistroVisitas();
 		
 		for($i=0; $i<count($registros); $i++)
 		{
