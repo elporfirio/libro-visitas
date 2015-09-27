@@ -109,3 +109,27 @@ thead {
 	letter-spacing: -0.1em;
 	font-size: 1.2em;
 }
+
+.exitoso {
+    background-color: #E3EDD9;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 15px;
+    font-family: sans-serif;
+    color: #5A824A;
+    border: 1px dashed #5A824A;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.no_exitoso {
+    background-color: #EEDFDF;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 15px;
+    font-family: sans-serif;
+    color: #AA5660;
+    border: 1px dashed #AA5660;
+    border-radius: 20px;
+    text-align: center;
+}

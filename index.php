@@ -31,7 +31,11 @@ $_SESSION['captcha'] = simple_php_captcha();
           <input type="submit" class="boton" id="boton" value="enviar comentario">
     </form>
     </div>
-    <br><br>
+    <br>
+    <div id="respuesta" style="display: none">
+
+    </div>
+    <br>
     <div id="area_comentarios">
       <table>
         <h2>Comentarios anteriores</h2>
@@ -60,6 +64,12 @@ $_SESSION['captcha'] = simple_php_captcha();
             });
         }
 
+        function quitarRespuesta(){
+            setTimeout(function(){
+                $("#respuesta").fadeOut();
+            }, 3000);
+        }
+
         function registrarDatos(){
             var nombre = $("#nombre").val();
             var mensaje = $("#mensaje").val();
@@ -69,14 +79,29 @@ $_SESSION['captcha'] = simple_php_captcha();
                 verificacion : captcha,
                 nombre_visitante : nombre,
                 mensaje_visitante : mensaje
-            }).done(function(data){
-                console.info(data);
-                traerDatos();
+            }, function(data){
+                if(data.exitoso == false){
+                    $("#respuesta")
+                        .text(data.mensaje)
+                        .removeClass()
+                        .addClass('no_exitoso')
+                        .fadeIn();
+                    $("#captcha").val('');
+                    quitarRespuesta();
+                } else {
+                    traerDatos();
+                    $("#respuesta")
+                        .text(data.mensaje)
+                        .removeClass()
+                        .addClass('exitoso')
+                        .fadeIn();
 
-                $("#nombre").val('');
-                $("#mensaje").val('');
-                $("#captcha").val('');
-            });
+                    $("#nombre").val('');
+                    $("#mensaje").val('');
+                    $("#captcha").val('');
+                    quitarRespuesta();
+                }
+            }, 'json');
         }
 
         $("#formulario_visitas").on("submit", function(evento){
