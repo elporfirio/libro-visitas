@@ -19,7 +19,8 @@ if($captcha == $verificar){
         $operador = new Operador();
         $operador->guardarComentario($conexion,$comentario);
 
-        header('Location: index.php');
+        echo "Dato registrado";
+        //header('Location: index.php');
     }
     else
     {

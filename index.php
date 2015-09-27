@@ -17,16 +17,16 @@ $_SESSION['captcha'] = simple_php_captcha();
 <div id="contenido">
 	<div id="area_formulario">
     <h2>Gracias por tus comentarios</h2>
-    <form action="registrar.php" method="post" name="formulario_visitas">
+    <form action="registrar.php" method="post" name="formulario_visitas" id="formulario_visitas">
           <label>Nombre:</label>
-          <input name="nombre_visitante" type="text" required>
+          <input name="nombre_visitante" id="nombre" type="text" required>
           <br><br>
           <label>Mensaje:</label>
-          <textarea name="mensaje_visitante" cols="40" rows="5" required></textarea>
+          <textarea name="mensaje_visitante" id="mensaje" cols="40" rows="5" required></textarea>
           <br><br>
           <label>¿Eres humano?:</label>
           <img src="<?php echo $_SESSION['captcha']['image_src'] ?>">
-          <input name="verificacion" type="text" required>
+          <input name="verificacion" id="captcha" type="text" required>
           <br><br>
           <input type="submit" class="boton" id="boton" value="enviar comentario">
     </form>
@@ -43,34 +43,50 @@ $_SESSION['captcha'] = simple_php_captcha();
         </tr>
         </thead>
         <tbody>
-        <?php
-		require_once("clases.php");
 
-        $conexion = new Conexion();
-
-        #$comentario = new Comentario();
-        $operador = new Operador();
-        $operador->consultarComentarios($conexion);
-
-        $comentarios = $operador->comentarios;
-
-		
-		foreach($comentarios as $comentario)
-		{
-        ?>
-        <tr>
-    		<td><?php echo $comentario->nombre; ?></td>
-    		<td><?php echo $comentario->mensaje; ?></td>
-    		<td align="center"><?php echo $comentario->fecha; ?></td>
-        </tr>
-        <?php
-		}
-		?>
         </tbody>
       </table>      
     </div>
    <p class="creditos">Desarrollado by <a href="http://www.elporfirio.com">elporfirio.com</a> en base a <a href="http://www.cesarcancino.com">Cesar Cancino</a></p>
 </div>
 
+<script src="jquery.js"></script>
+<script>
+    $(document).ready(function(){
+
+        function traerDatos(){
+            $.get("consultar.php", function(respuesta){
+                $("tbody").html(respuesta);
+            });
+        }
+
+        function registrarDatos(){
+            var nombre = $("#nombre").val();
+            var mensaje = $("#mensaje").val();
+            var captcha = $("#captcha").val();
+
+            $.post("registrar.php",{
+                verificacion : captcha,
+                nombre_visitante : nombre,
+                mensaje_visitante : mensaje
+            }).done(function(data){
+                console.info(data);
+                traerDatos();
+
+                $("#nombre").val('');
+                $("#mensaje").val('');
+                $("#captcha").val('');
+            });
+        }
+
+        $("#formulario_visitas").on("submit", function(evento){
+            evento.preventDefault();
+
+            registrarDatos();
+        });
+
+        traerDatos();
+    });
+</script>
 </body>
 </html>
