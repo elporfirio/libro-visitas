@@ -58,17 +58,18 @@ $_SESSION['captcha'] = simple_php_captcha();
 <script>
     $(document).ready(function(){
 
-        function traerDatos(){
+        var traerDatos = function (){
             $.get("consultar.php", function(respuesta){
                 $("tbody").html(respuesta);
             });
-        }
+        };
 
         function quitarRespuesta(){
             setTimeout(function(){
                 $("#respuesta").fadeOut();
             }, 3000);
         }
+
 
         function registrarDatos(){
             var nombre = $("#nombre").val();
